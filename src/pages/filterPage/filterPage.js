@@ -1,15 +1,27 @@
+const toggleLoader = () => {
+  const dom = document.getElementById("loader-container");
+  dom.classList?.toggle("hidden");
+};
+
 // Ok
 const callApi = async (url) => {
   const cors = "https://melodycors.herokuapp.com/";
   const apiKey =
     "XbwVX7w36FwIoJR-cLgnNHErUzWI0SBOAUJYoe0PTjpGuofzTpk0xDrogIA-zx4Q2cUClcg4AjVSe8o7khBxTumGTf5_co2YKzbgeHfGi9i9pbiL8zR6sqjZDJalYnYx";
+
+  toggleLoader();
+
   const response = await fetch(`${cors}${url}`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${apiKey}`,
     },
   });
-  return await response.json();
+  const json = await response.json();
+
+  toggleLoader();
+
+  return json;
 };
 
 // Ok
@@ -24,8 +36,8 @@ class TopPickPlace {
   }
   showTopPickPlace(parentElm) {
     const htmlTopPick = `
-      <div class="location mb-2">
-          <img class="location-icon" src="../img/map-point-icon.svg" alt="icon-location">
+      <div class="location mb-2 mx-2">
+          <img class="location-icon" src="/src/img/icon-locaiton-topPick-white.svg" alt="icon-location">
           <p class="location-name mb-0">${this.#locationName}</p>
       </div>
     `;
@@ -44,28 +56,38 @@ class TopPickPlace {
 
 // Ok
 class RestaurantFilter {
-  #id;
   #restaurantName;
   #imageUrl;
   #rating;
   constructor(restaurant) {
-    this.#id = restaurant.id;
+    this.id = restaurant.id;
     this.#restaurantName = restaurant.name;
     this.#imageUrl = restaurant.image_url;
     this.#rating = restaurant.rating;
   }
+
   showRestaurantCard() {
-    return `
-      <a class="restaurant-card my-2 border-0" id ="${this.#id}" href="../restaurantPage/restaurantPage.html?id=${this.#id}">
-            <img
-              src=${this.#imageUrl}
-              class="card-img-top restaurant-image rounded-4"
-              alt="restaurant-image"
-            />
-            <h6 class="restaurant-card-name mb-0 mt-1">${this.#restaurantName}</h6>
-            <p class="restaurant-card-review mb-0"> Review: ${this.#rating}</p>
-      </a>
+    const starPercentage = `${(this.#rating / 5) * 100}%`;
+    const htmlCard = `
+      <div class="card d-inline-block mb-4">
+        <a class="restaurant-card my-2" href="../restaurantPage/restaurantPage.html?id=${this.id}">
+          <img
+            src=${this.#imageUrl}
+            class="card-img-top restaurant-image"
+            alt="restaurant-image"
+          />
+          <div class="mx-2">
+            <h6 class="restaurant-card-name mb-0 mt-3 mx-1">${this.#restaurantName}</h6>
+            <div class="user-rating">
+              <div class="stars-outer">
+                <div class="stars-inner" style="width:${starPercentage}"></div>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
     `;
+    return htmlCard;
   }
 }
 
@@ -172,8 +194,15 @@ const renderFilterPage = async function (location) {
     const url = await getFilterLink(location);
     const { businesses } = await callApi(url);
     const filterPageContent = businesses.map((resObj) => new RestaurantFilter(resObj).showRestaurantCard()).join("");
-
     restaurantCardContainer.insertAdjacentHTML("afterbegin", filterPageContent);
+
+    const navbarHeight = document.querySelector(".navbar").clientHeight;
+    const restaurantCardContainerTop = restaurantCardContainer.offsetTop;
+    const top = restaurantCardContainerTop - navbarHeight;
+    window.scrollTo?.({
+      top,
+      behavior: "smooth", // smooth doesn't work for safari
+    });
   } catch {
     restaurantCardContainer.innerHTML = "";
   }
@@ -185,30 +214,31 @@ const onCategoriesClick = async (topPickPlaces) => {
   renderFilterPage(location);
 };
 
-//FIXME: can you help me, how to clean code for 2 funciton below: toggleLocationCOntainer and closeLocationContainer.
-const toggleLocationContainer = () => {
+const toggleLocationContainer = (isForceHidden = false) => {
   const locationContainer = document.querySelector(".location-container");
   const overlayLayer = document.querySelector(".overlay");
-  [locationContainer, overlayLayer].forEach((event) => {
-    event.classList?.toggle("hidden");
-  });
-};
-
-const closeLocationContainer = () => {
-  const locationContainer = document.querySelector(".location-container");
-  const overlayLayer = document.querySelector(".overlay");
-  [locationContainer, overlayLayer].forEach((event) => {
-    event.classList?.add("hidden");
+  [locationContainer, overlayLayer].forEach((dom) => {
+    if (isForceHidden) {
+      dom.classList?.add("hidden");
+    } else {
+      dom.classList?.toggle("hidden");
+    }
   });
 };
 
 // Ok
 const addEventListeners = (topPickPlaces) => {
-  document.querySelector(".search-location").addEventListener("click", toggleLocationContainer);
-  document.addEventListener("keydown", (evnt) => {
-    if (evnt.key === "Escape") closeLocationContainer();
+  document.querySelector(".search-location").addEventListener("click", () => {
+    toggleLocationContainer();
   });
-  document.querySelector(".overlay").addEventListener("click", closeLocationContainer);
+
+  document.addEventListener("keydown", (evnt) => {
+    if (evnt.key === "Escape") toggleLocationContainer(true);
+  });
+
+  document.querySelector(".overlay").addEventListener("click", () => {
+    toggleLocationContainer(true);
+  });
 
   document.querySelector(".location-container").addEventListener("click", (evnt) => {
     const target = evnt.target;
@@ -219,7 +249,7 @@ const addEventListeners = (topPickPlaces) => {
     target.classList.toggle("selected-location");
     onPlaceClicked(topPickPlaces);
 
-    closeLocationContainer();
+    toggleLocationContainer(true);
     document.querySelector(".category-title").classList.remove("hidden");
   });
 

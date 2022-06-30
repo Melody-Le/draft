@@ -8,6 +8,7 @@ body {
   font-family: "Montserrat", sans-serif;
   color: #868e96;
   position: relative;
+  min-height: 100vh;
 }
 
 /* NOTE: GENERAL  */
@@ -16,6 +17,9 @@ a {
 }
 
 /* NOTE:NAVIGATION BAR  */
+nav {
+  background-color: rgba(248, 248, 248, 0.9);
+}
 .brand {
   font-family: "Rubik Moonrocks", cursive;
   font-size: 1.5rem;
@@ -25,16 +29,27 @@ a {
   width: 5rem;
 }
 #toggler-icon {
-  background-image: url("../img/toggle-icon.png");
+  background-image: url("/src/img/toggle-icon.png");
   background-size: 2.5rem;
   background-position: center;
   border: none;
+}
+.dropdown {
+  margin-left: 1rem;
+}
+.dropdown-menu {
+  margin-right: 1rem;
+  margin-top: 1rem !important;
+  border: #549490 1px solid;
 }
 .account {
   width: 4rem;
   height: 4rem;
   border-radius: 5rem;
-  margin-left: 2rem;
+  box-shadow: 2px 5px 8px rgba(2, 2, 1, 0.5);
+}
+.nav-link {
+  text-shadow: 1px 1px 3px rgba(2, 2, 1, 0.1);
 }
 
 /* NOTE: FILTER PAGE */
@@ -53,13 +68,12 @@ a {
 .hidden {
   display: none !important;
 }
-
 .search-location-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-image: url(../img/home-cover1.png);
+  background-image: url(/src/img/home-cover1.png);
   background-size: cover;
   background-position: center;
   min-height: 50vh;
@@ -70,13 +84,16 @@ a {
   align-items: center;
   height: 3rem;
 }
-
 .location-icon {
   width: 2rem;
   margin-right: 1rem;
 }
 .search-map {
   width: 3rem;
+  box-shadow: 2px 5px 8px rgba(15, 15, 15, 0.9);
+}
+.search-location {
+  box-shadow: 2px 5px 8px rgba(15, 15, 15, 0.9);
 }
 .search-btn {
   width: 2rem;
@@ -119,7 +136,7 @@ a {
   align-items: center;
   flex: 8rem 0 0;
   height: 8rem;
-  background-image: url(../img/home-cover2.png);
+  background-image: url(/src/img/home-cover2.png);
   background-size: cover;
   background-position: center;
   border-radius: 8rem;
@@ -137,8 +154,25 @@ a {
 }
 
 /* FILTER PAGE CONTENT  */
+.card {
+  border: #549490 1px solid;
+  border-radius: 2rem;
+  padding-bottom: 2rem;
+  box-shadow: 2px 5px 7px rgba(15, 15, 15, 0.5);
+}
+.restaurant-image {
+  width: 100%;
+  object-fit: cover;
+  border-radius: 2rem 2rem 30% 0;
+  transition: all 0.2s;
+}
+.restaurant-image:hover {
+  object-fit: cover;
+  border-radius: 2rem 2rem 0 0;
+}
 .restaurant-card {
-  color: #030303;
+  color: white;
+  color: #549490;
   text-decoration: none;
   font-weight: 500;
 }
@@ -146,11 +180,39 @@ a {
   color: #de6035 !important;
 }
 
+/* SETTING CARD COLUMN  */
 @media (max-width: 575.98px) {
   .card-columns {
     column-count: 1;
   }
 }
+
+@media (max-width: 768px) {
+  .offcanvas-end {
+    width: auto;
+    max-width: 50%;
+    margin-left: 2rem;
+  }
+  .navbar-nav {
+    display: flex;
+  }
+  .nav-item {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+  .nav-link {
+    border-top: #549490 1px solid;
+  }
+  .nav-link :nth-last-child(1) {
+    border-top: none;
+  }
+  .dropdown {
+    margin-bottom: 1rem;
+    margin-top: 1rem;
+    order: -1;
+  }
+}
+
 @media (min-width: 576px) {
   .card-columns {
     column-count: 2;
@@ -170,4 +232,68 @@ a {
   .card-columns {
     column-count: 4;
   }
+}
+
+/* LOADER  */
+#loader-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #000;
+  border-color: #000 transparent #000 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* RATING ICON */
+.stars-outer {
+  display: inline-block;
+  position: relative;
+  font-family: "FontAwesome";
+}
+.stars-outer::before {
+  content: "\f006 \f006 \f006 \f006 \f006";
+}
+.stars-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 0%;
+}
+.stars-inner::before {
+  content: "\f005 \f005 \f005 \f005 \f005";
+  color: #549490;
+}
+.icon {
+  height: 3rem;
 }
